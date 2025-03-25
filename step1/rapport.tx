@@ -1,4 +1,5 @@
-Comprehension du Makefile
+Auteur: Salimata CISSOUMA
+Partie1: Comprehension du Makefile
 
 I- La partie configurable
     BOARD : Définit la carte cible, versatile dans notre cas. La valeur versatile dans un makefile designe l'utilisation d'une plateforme matériele émulé par 
@@ -22,6 +23,8 @@ II- La partie non configurable
         quantité de mémoire disponible. De plus $(VGA) qui recupère la valeur attribué à VGA pour spécifier le mode d'affichage et $(SERIAL) pour la 
         configuration de la sortie en série.
         question: Est ce que les valeurs utilisés dans QEMUARGS doivent etre prédéfini à chaque fois?
+        Réponse: Il est nécéssaire de les définir pour éviter des soucis de manupilation par la suite. Sans définition il est possible d'avoir des retours
+        disant que 
 
         Options de compilation et de linkage
         CFLAGS: Cette variable prend comme valeur les options de compilation pour gcc. ( -c: compile uniquement, -mcpu=: spécifie l'architecture processeur,
@@ -62,5 +65,23 @@ V- Cibles pour lancer QEMU : fonctionnement autonome ou sous le contrôle de gdb
         debug: all : Lance en mode débogage et ajoute -gdb tcp::1234 -S pour permettre la connexion à gdb sur le port 1234.
 
 all: signifie en générale dans un makefile qu'on souhaite compiler tout en une seule fois.
+
+Partie2: Implémentation du UART0
+  - Definition du  UART0_BASE_ADDRESS
+  - Definition de UART_DR et UART_FR
+  - Implémentation uart_receive(uint8_t uartno, char *pt): Cette fonction attend de recevoir des données par l'UART, puis les lit à partir du registre de 
+  données et les place dans la variable pointée par pt.Elle utilise une boucle pour attendre que la FIFO de réception contienne des données avant de lire un 
+  caractère. Le registre de statut UART_FR est utilisé pour vérifier l'état de la FIFO de réception et déterminer quand des données sont disponibles.
+  - Implémentation de void uart_send(uint8_t uartno, char s): Elle envoie un caractère à travers l'UART. Attend que la FIFO de transmission de l'UART soit prête.
+  Une fois fait, le caractère est écrit dans le registre de données (uart_dr) ce qui initie l'envoie via L'UART.
+
+  Remarque: Vérifier à chaque fois que les pointeurs sont bien castés et que toutes les valeurs sont initialisés.
+
+
+Pour cette semaine en plus des deux steps du Homework
+  Confirmer qu'on reçoit un encodage des lettres.
+  Combien d'octects reçoit-on?
+  Perso comprendre le système de transmisson
+
 
 

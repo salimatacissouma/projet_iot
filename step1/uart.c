@@ -16,6 +16,7 @@
 #include "uart.h"
 #include "uart-mmio.h"
 
+
 struct uart {
   uint8_t uartno; // the UART numéro
   void* bar;      // base address register for this UART
@@ -36,7 +37,8 @@ void uart_init(uint32_t uartno, void* bar) {
 }
 
 void uarts_init() {
-  uart_init(UART0,UART0_BASE_ADDRESS);
+  // uart_init(UART0,UART0_BASE_ADDRESS);
+  uart_init(UART0, (void*)UART0_BASE_ADDRESS);
   uart_init(UART1,UART1_BASE_ADDRESS);
   uart_init(UART2,UART2_BASE_ADDRESS);
 }
@@ -55,8 +57,13 @@ void uart_disable(uint32_t uartno) {
 
 void uart_receive(uint8_t uartno, char *pt) {
   struct uart*uart = &uarts[uartno];
-  // TODO: not implemented yet...
-  panic();
+  volatile uint32_t* uart_fr = (volatile uint32_t *)(uart->bar + UART_FR);
+  volatile uint32_t* uart_dr = (volatile uint32_t *)(uart->bar + UART_DR);
+  while ((*uart_fr) & 0x10) {
+    // Attends que des données arrivent
+  }
+  *pt = (char)(*uart_dr);
+  //panic();
 }
 
 /**
@@ -65,8 +72,14 @@ void uart_receive(uint8_t uartno, char *pt) {
  */
 void uart_send(uint8_t uartno, char s) {
   struct uart* uart = &uarts[uartno];
-  // TODO: not implemented yet...
-  panic();
+  volatile uint32_t* uart_fr = (volatile uint32_t *)(uart->bar + UART_FR);
+  volatile uint32_t* uart_dr = (volatile uint32_t *)(uart->bar + UART_DR);
+     while (*uart_fr & (1 << 5)) {
+    // Attendre que la FIFO soit prête
+  }
+  
+  *uart_dr = s;
+ // panic();
 }
 
 /**

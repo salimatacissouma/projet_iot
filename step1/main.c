@@ -40,13 +40,16 @@ void _start(void) {
   check_stacks();
   uarts_init();
   uart_enable(UART0);
+  uart_send_string(UART0, "Hello, UART!\n");
   for (;;) {
     uart_receive(UART0, &c);
     uart_send(UART0, c);
   }
+
 }
 
 void panic() {
   for(;;)
     ;
 }
+
