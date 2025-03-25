@@ -1,0 +1,66 @@
+Comprehension du Makefile
+
+I- La partie configurable
+    BOARD : Définit la carte cible, versatile dans notre cas. La valeur versatile dans un makefile designe l'utilisation d'une plateforme matériele émulé par 
+    QEMU. Pour faire une exécution sur une carte spécifique,
+    il faut changer la valeur de BOARD. 
+
+    CPU : Définit l’architecture cible, (cortex-a8 dans notre cas) (un processeur ARM utilisé dans certains systèmes embarqués).
+
+    TOOLCHAIN : Indique l’outil de compilation utilisé (arm-none-eabi désigne un compilateur GCC pour ARM).
+
+    DEBUG : Option de débogage (yes par défaut, ce qui active les symboles de débogage).
+
+    BUILD : Prend la valeur du répertoire où seront placés les fichiers générés.
+    objs: Il prend la liste des fichiers objets nécéssaire à la génération du noyau.
+
+II- La partie non configurable
+        OBJS: A ce niveau on ajoute la valeur de BUILD comme prefixe aux fichiers objet pourqu'ils soient placé dans le bon repertoire.
+        Dans un makefile ifeq est une directive conditionnelle qui est exécuté que une certaine condition est vérifiée lors de la construction du noyau.
+        ifeq sur la variable BOARD:
+        Dans QEMUARGS j'ai plusieurs option qui sont utilisés: -M pour spécifier la machine à émuler, -cpu pour definir le processeur à utilser, -m definit la 
+        quantité de mémoire disponible. De plus $(VGA) qui recupère la valeur attribué à VGA pour spécifier le mode d'affichage et $(SERIAL) pour la 
+        configuration de la sortie en série.
+        question: Est ce que les valeurs utilisés dans QEMUARGS doivent etre prédéfini à chaque fois?
+
+        Options de compilation et de linkage
+        CFLAGS: Cette variable prend comme valeur les options de compilation pour gcc. ( -c: compile uniquement, -mcpu=: spécifie l'architecture processeur,
+        -nostdlib: exclus l'utilisation des bibliothèques standard, -ffreestanding: indique que le programme ne depend pas d'un environnement standard,
+        -DCPU=$(CPU): definit une maccro CPU qui sera utilisé dans le code, -DMEMORY: definit une maccro MEMORY). CFLAGS+ fait juste une concatenation des
+        anciennes valeurs avec les nouvelles spécifiées à son niveau.
+        ASFLAGS: Cette variable prend comme valeur les options d'assemblage.
+        LDFLAGS: Elle prend les options d'édition de liens (-T kernel.ld:utilise un script d’édition de liens (kernel.ld) pour contrôler la disposition
+        en mémoire, -nostdlib, -static: génère un exécutable entièrement autonome, sans bibliothèques dynamiques ).
+
+        ifeq sur la variable DEBUG:
+        Dans CFLAGS( -ggdb : Ajoute des informations de débogage pour gdb) et dans ASFLAGS et LDFLAGS (-g génère les symboles de débogage).
+
+        ifndef: directive conditionnelle sur la non dénition d'une variable.
+
+III- Les règles de compilation:
+        $< : Prend le fichier source (.c)
+        $@ : Définit le fichier de sortie (.o)
+        $(TOOLCHAIN)-gcc : precise l'utilisation de gcc
+        $(TOOLCHAIN)-as : Utilise l’assembleur pour convertir (.s) en (.o)
+
+IV- Build et liaison
+        (build : crée le répertoire de compilation s’il n’existe pas, kernel.elf : génère le fichier exécutable du noyau, kernel.bin : Convertit le fichier 
+        ELF en binaire brut).
+
+        $(BUILD)kernel.elf: $(OBJS): génère les fichiers (.elf) en utilisant l'option -ld pour lier chaque fichier(.elf) à un fichier (.o).
+        $(BUILD)kernel.bin: $(BUILD)kernel.elf: fait la convertion des (.elf) en (.bin) avec l'option -objcopy.
+    
+    build:
+	@mkdir $(BUILD): crée le dossier de compilation
+
+    clean: 
+	rm -rf $(BUILD): nettoyage des fichiers compilés.
+
+V- Cibles pour lancer QEMU : fonctionnement autonome ou sous le contrôle de gdb
+
+        run: all : Compile le projet puis exécute QEMU avec le noyau
+        debug: all : Lance en mode débogage et ajoute -gdb tcp::1234 -S pour permettre la connexion à gdb sur le port 1234.
+
+all: signifie en générale dans un makefile qu'on souhaite compiler tout en une seule fois.
+
+
