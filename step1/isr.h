@@ -36,19 +36,19 @@
  * The maximum number of interrupts
  * handled by the VIC
  */
-#define NIRQS ???
+#define NIRQS 32
 
 /*
  * UART Interrupts
  */
-#define UART0_IRQ ???
-#define UART0_IRQ_MASK ???
+#define UART0_IRQ 12
+#define UART0_IRQ_MASK (1 << UART0_IRQ)
 
-#define UART1_IRQ ???
-#define UART1_IRQ_MASK ???
+#define UART1_IRQ 13
+#define UART1_IRQ_MASK (1 << UART1_IRQ)
 
-#define UART2_IRQ ???
-#define UART2_IRQ_MASK ???
+#define UART2_IRQ 14
+#define UART2_IRQ_MASK (1 << UART2_IRQ)
 
 /*
  * Timers:
@@ -64,6 +64,9 @@
 
 #define TIMER0_IRQ ???
 #define TIMER0_IRQ_MASK ???
+
+
+
 
 /*
  * Core interrupt-related behavior:

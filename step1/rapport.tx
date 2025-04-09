@@ -1,4 +1,6 @@
 Auteur: Salimata CISSOUMA
+
+A- Semaine1
 Partie1: Comprehension du Makefile
 
 I- La partie configurable
@@ -82,6 +84,49 @@ Pour cette semaine en plus des deux steps du Homework
   Confirmer qu'on reçoit un encodage des lettres.
   Combien d'octects reçoit-on?
   Perso comprendre le système de transmisson
+
+  Questions: Est-ce plus coherent d'utiliser uint32_t à la place du uint8_t ? 
+
+
+A- Semaine2
+
+Pour l'implémentation de cette partie, il fallait dans:
+isr.h
+  - Definition du NIRQS
+  - Definition de UARTx_IRQ et UARTx_IRQ_MASK pour chaque UARTx
+isr-immio.h
+  - Definition du VIC_BASE_ADDR
+  - Definition du VICIRQSTATUS
+  - Definition du VICFIQSTATUS
+  - Definition du VICRAWSTATUS
+  - Definition du VICINTSELECT
+  - Definition du VICINTENABLE
+  - Definition du VICINTCLEAR
+isr.c
+  - Implémentation de void isr(): C'est l'ISR (Interrupt Service Routine) qui est appelée lorsqu'une interruption est déclenchée. Elle sert à gérer 
+  l'interruption, à vérifier quel périphérique a généré l'interruption, et à appeler les gestionnaires d'interruptions correspondants.
+  - Implémentation de void vic_setup_irqs(): A ce niveau j'ai juste fait appelle à la fonction _irqs_setup() définie en assembleur.
+  - Implémentation de void void vic_enable_irq(uint32_t irq, void (*callback)(uint32_t, void*), void *cookie): Cette fonction permet d'activer une IRQ
+  spécifiqun et d'associer un gestionnaire d'interruption à cette IRQ.
+kernel.ld
+A ce niveau j'ai juste rajouté la définition de l'étiquette en alignant la mémoire, réservant 4 Ko pour la pile d'interruption et 
+marquant le début de cette pile.
+exception.s 
+Dans ce fichier j'ai rajouté le code qui sauvegarde les registres, appelle le gestionnaire d'interruption en C, puis restaure les registres et 
+retourne à l’exécution normale.
+
+Points de difficulté:
+Pour l'implémentation de cette étape, j'ai rencontré plusieurs difficultés. Dans un premier temps, j'ai eu du mal à comprendre la logique globale. 
+Une fois celle-ci assimilée, j'ai été confronté à des erreurs de compilation dues à des variables non initialisées et à des règles mal définies. 
+L'exécution des tests a également présenté des défis similaires. En conséquence, j’ai pris plus de temps que prévu pour finaliser et valider cette étape.
+J'ai modifier la methode uart_receive(uint8_t uartno, char *pt) pour le bon fonctionnement de mes interruptions.
+La classe main est maintenant adaptée pour le test des interputions.
+
+
+
+
+
+
 
 
 

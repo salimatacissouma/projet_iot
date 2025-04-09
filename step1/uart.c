@@ -53,16 +53,17 @@ void uart_disable(uint32_t uartno) {
   struct uart*uart = &uarts[uartno];
   // nothing to do here, as long as
   // we do not rely on interrupts
+  
 }
 
 void uart_receive(uint8_t uartno, char *pt) {
-  struct uart*uart = &uarts[uartno];
-  volatile uint32_t* uart_fr = (volatile uint32_t *)(uart->bar + UART_FR);
-  volatile uint32_t* uart_dr = (volatile uint32_t *)(uart->bar + UART_DR);
-  while ((*uart_fr) & 0x10) {
-    // Attends que des données arrivent
+ struct uart* uart = &uarts[uartno];
+  uint32_t fr = mmio_read32(uart->bar, UART_FR);
+  if (fr & UART_FR_RXFE) {
+    *pt = 0;
+  } else {
+    *pt = (char)mmio_read32(uart->bar, UART_DR);
   }
-  *pt = (char)(*uart_dr);
   //panic();
 }
 

@@ -15,6 +15,7 @@
 #include "main.h"
 #include "isr.h"
 #include "isr-mmio.h"
+#include "uart.h"
 
 /*
  * Assembly functions:
@@ -40,8 +41,18 @@ struct handler handlers[NIRQS];
  * status and call the corresponding handlers.
  */
 void isr() {
-  // TODO
-  panic();
+   uart_send_string(UART0, "\n[ISR] IRQ received!\n");
+  volatile uint32_t *vic_status = (volatile uint32_t *)VICIRQSTATUS;
+  uint32_t status = *vic_status;
+
+  for (uint32_t irq = 0; irq < NIRQS; irq++) {
+    if (status & (1 << irq)) {
+      if (handlers[irq].callback) {
+        handlers[irq].callback(irq, handlers[irq].cookie);
+      }
+    }
+  }
+  //panic();
 }
 
 void core_enable_irqs() {
@@ -62,16 +73,28 @@ void core_halt() {
  * sides.
  */
 void vic_setup_irqs() {
-  // TODO
-  panic();
+  _irqs_setup();
+  //panic();
 }
 
 /*
  * Enables the given interrupt at the VIC level.
  */
 void vic_enable_irq(uint32_t irq, void (*callback)(uint32_t, void*), void *cookie) {
-  // TODO
-  panic();
+   if (irq >= NIRQS)
+    return;
+
+  handlers[irq].callback = callback;
+  handlers[irq].cookie = cookie;
+
+  // Sélectionner le type IRQ (et non FIQ)
+  volatile uint32_t *vic_select = (volatile uint32_t *)VICINTSELECT;
+  *vic_select &= ~(1 << irq);
+
+  // Activer l’interruption
+  volatile uint32_t *vic_enable = (volatile uint32_t *)VICINTENABLE;
+  *vic_enable |= (1 << irq);
+  //panic();
 }
 
 /*
@@ -79,5 +102,6 @@ void vic_enable_irq(uint32_t irq, void (*callback)(uint32_t, void*), void *cooki
  */
 void vic_disable_irq(uint32_t irq) {
   // TODO
-  panic();
+
+  //panic();
 }
