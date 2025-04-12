@@ -27,8 +27,8 @@
  */
 
 #define UART0_BASE_ADDRESS ((void*)0x101F1000)
-#define UART1_BASE_ADDRESS ((void*)0x0000000) // ???
-#define UART2_BASE_ADDRESS ((void*)0x0000000) // ???
+#define UART1_BASE_ADDRESS ((void*)0x101F2000) 
+#define UART2_BASE_ADDRESS ((void*)0x101F3000) 
 
 /*
  * Is the UART chipset a PL011?
@@ -36,5 +36,21 @@
  */
 #define UART_DR 0x00 
 #define UART_FR 0x18 
+#define UART_FR_RXFE (1 << 4)   // FIFO de réception est vide
+#define UART_FR_TXFF (1 << 5)   // FIFO de transmission est plein
+
+#define UART_IMSC   0x038 // registre de masque d'interruptions, pour activer/désactiver les interruptions
+#define UART_IMSC_RXIM (1 << 4) // masque d'interruption de réception, contrôle l'interruption RX
+
+#define UART_RIS    0x03C // registre de statut d'interruption brut, indique ce qui a déclenché l'interruption
+#define UART_MIS    0x040 // registre de statut d'interruption masqué, combinaison de UART_IMSC et UART_RIS
+
+#define UART_ICR    0x044 // registre de réinitialisation des interruptions, réinitialise les flags spécifiques dans UART_RIS
+
+
+
+
+
+
 
 #endif /* UART_MMIO_H_ */

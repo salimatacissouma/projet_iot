@@ -56,7 +56,11 @@ SECTIONS
    *    your stack does not overflow at runtime when
    *    nesting too many C function calls. 
    */
-  . = ALIGN(8);
+. = ALIGN(8);
   . = . + 0x1000; /* 4KB of stack memory */
   stack_top = .;
+
+  . = ALIGN(8);
+  . = . + 0x1000; /* 4KB of irq stack memory */
+  irq_stack_top = .;
 }

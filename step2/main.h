@@ -19,6 +19,7 @@
 #include <stddef.h>
 
 typedef uint8_t bool_t;
+void test_uart();
 void panic();
 void kprintf(const char *fmt, ...);
 
